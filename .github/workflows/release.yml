@@ -79,7 +79,11 @@ jobs:
 
   macos:
     needs: test
-    runs-on: macos-15 # Apple Silicon; the Intel slice is cross-compiled
+    # Intel runner: the Apple Silicon (arm64) runners are often unavailable for
+    # hours because of capacity limits. Both slices build fine on Intel; the
+    # arm64 one is cross-compiled.
+    runs-on: macos-15-intel
+    timeout-minutes: 60
     env:
       CGO_ENABLED: "1"
       # Go 1.26 binaries need macOS 12 or later
@@ -102,10 +106,10 @@ jobs:
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "ldflags=-s -w -X main.AppVersion=$V -X main.GitHubRepo=${{ github.repository }}" >> "$GITHUB_OUTPUT"
       - name: Build Apple Silicon binary
+        env:
+          CC: clang -arch arm64
         run: GOARCH=arm64 go build -v -trimpath -tags desktop,production -ldflags "${{ steps.v.outputs.ldflags }}" -o build/bin/Photo2GPX-arm64 .
       - name: Build Intel binary
-        env:
-          CC: clang -arch x86_64
         run: GOARCH=amd64 go build -v -trimpath -tags desktop,production -ldflags "${{ steps.v.outputs.ldflags }}" -o build/bin/Photo2GPX-amd64 .
       - name: Universal binary
         run: |
@@ -139,9 +143,11 @@ jobs:
           name: macos
           path: dist/*
 
+  # Publishes what was built. If macOS failed, the Windows release still goes
+  # out; "Re-run failed jobs" later adds the macOS files to the same release.
   release:
     needs: [windows, macos]
-    if: github.ref_type == 'tag'
+    if: always() && github.ref_type == 'tag' && needs.windows.result == 'success'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v6
@@ -153,8 +159,12 @@ jobs:
           cd dist
           sha256sum Photo2GPX-* > checksums.txt
           cat checksums.txt
+          if [ ! -f Photo2GPX-macos-universal.zip ]; then
+            echo "::warning::macOS build missing: this release has the Windows files only. Re-run the failed macos job to add them."
+          fi
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/*
           generate_release_notes: true
+          overwrite_files: true
           prerelease: ${{ contains(github.ref_name, '-') }}
