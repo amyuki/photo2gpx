@@ -43,7 +43,7 @@ go run -tags desktop,production,webkit2_41 .
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -tags desktop,production -ldflags "-H windowsgui -s -w" -o build/Photo2GPX.exe .
 
 # macOS
-go build -trimpath -tags desktop,production -o build/Photo2GPX .
+CGO_LDFLAGS="-framework UniformTypeIdentifiers" go build -trimpath -tags desktop,production -o build/Photo2GPX .
 ```
 
 Local builds use the version and repository set in `menu.go`. Release builds override them with `-ldflags "-X main.AppVersion=… -X main.GitHubRepo=…"` (see [RELEASING.md](RELEASING.md)).

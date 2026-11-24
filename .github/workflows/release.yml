@@ -88,6 +88,9 @@ jobs:
       CGO_ENABLED: "1"
       # Go 1.26 binaries need macOS 12 or later
       MACOSX_DEPLOYMENT_TARGET: "12.0"
+      # Wails uses UTType (file dialogs) but does not link its framework itself;
+      # the Wails CLI adds this flag, plain "go build" must do it here.
+      CGO_LDFLAGS: "-framework UniformTypeIdentifiers"
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6

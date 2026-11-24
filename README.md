@@ -86,7 +86,7 @@ You need [Go](https://go.dev/dl/) (version in `go.mod`). No Node.js is needed.
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -tags desktop,production -ldflags "-H windowsgui" -o Photo2GPX.exe .
 
 # macOS (on a Mac with Xcode command line tools)
-go build -tags desktop,production -o Photo2GPX .
+CGO_LDFLAGS="-framework UniformTypeIdentifiers" go build -tags desktop,production -o Photo2GPX .
 ```
 
 See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the project layout, tests and the browser preview.
