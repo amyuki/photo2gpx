@@ -29,8 +29,8 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: Install WebKitGTK (needed to compile the desktop package on Linux)
@@ -42,8 +42,8 @@ jobs:
     needs: test
     runs-on: ubuntu-24.04 # cross-compiled: the Windows build needs no cgo
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: Version
@@ -72,22 +72,22 @@ jobs:
           go build -trimpath -tags desktop,production \
             -ldflags "-H windowsgui -s -w -X main.AppVersion=${{ steps.v.outputs.version }} -X main.GitHubRepo=${{ github.repository }}" \
             -o dist/Photo2GPX-windows-amd64.exe .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: windows
           path: dist/*
 
   macos:
     needs: test
-    runs-on: macos-14
+    runs-on: macos-15 # Apple Silicon; the Intel slice is cross-compiled
     env:
       CGO_ENABLED: "1"
       MACOSX_DEPLOYMENT_TARGET: "10.15"
       CGO_CFLAGS: "-mmacosx-version-min=10.15"
       CGO_LDFLAGS: "-mmacosx-version-min=10.15"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - name: Version
@@ -125,7 +125,7 @@ jobs:
           cp -R build/bin/Photo2GPX.app build/bin/dmg/
           ln -s /Applications build/bin/dmg/Applications
           hdiutil create -volname "Photo2GPX" -srcfolder build/bin/dmg -ov -format UDZO dist/Photo2GPX-macos-universal.dmg
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: macos
           path: dist/*
@@ -135,7 +135,7 @@ jobs:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           path: dist
           merge-multiple: true
