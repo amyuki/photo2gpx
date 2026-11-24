@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleName</key><string>Photo2GPX</string>
+  <key>CFBundleDisplayName</key><string>Photo2GPX</string>
+  <key>CFBundleExecutable</key><string>Photo2GPX</string>
+  <key>CFBundleIdentifier</key><string>com.szeching.photo2gpx</string>
+  <key>CFBundleVersion</key><string>{{VERSION}}</string>
+  <key>CFBundleShortVersionString</key><string>{{VERSION}}</string>
+  <key>CFBundleIconFile</key><string>icon</string>
+  <key>LSMinimumSystemVersion</key><string>10.15.0</string>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>NSHumanReadableCopyright</key><string>© 2026 Yuki Cheung</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array><string>en</string><string>fr</string><string>zh-Hans</string><string>zh-Hant</string></array>
+</dict>
+</plist>

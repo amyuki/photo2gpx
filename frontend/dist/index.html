@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photo2GPX</title>
+<link rel="stylesheet" href="leaflet/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body style="--wails-drop-target: drop">
+<aside id="side">
+  <header>
+    <div class="titlebar">
+      <h1 data-i18n="appTitle"></h1>
+    </div>
+    <p class="sub" data-i18n="subtitle"></p>
+  </header>
+
+  <section id="drop" class="card drop">
+    <div class="drop-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+    </div>
+    <div>
+      <strong data-i18n="dropTitle"></strong>
+      <span data-i18n="dropHint"></span>
+    </div>
+    <div class="row">
+      <button id="btnPhotos" data-i18n="btnPhotos"></button>
+      <button id="btnRoute" data-i18n="btnRoute"></button>
+    </div>
+  </section>
+
+  <section class="card" id="routeCard">
+    <div class="label" data-i18n="routeLabel"></div>
+    <div id="routeNone" class="muted" data-i18n="routeNone"></div>
+    <div id="routeSome" hidden>
+      <div class="route-name"><span id="routeName"></span><button class="link" id="btnRemoveRoute" data-i18n="removeRoute"></button></div>
+      <label class="dir"><span data-i18n="direction"></span>
+        <select id="dir">
+          <option value="auto" data-i18n="dirAuto"></option>
+          <option value="forward" data-i18n="dirForward"></option>
+          <option value="reverse" data-i18n="dirReverse"></option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="stats card" id="stats">
+    <div><span class="k" data-i18n="stDist"></span><span class="v" id="sDist">–</span></div>
+    <div><span class="k" data-i18n="stTime"></span><span class="v" id="sTime">–</span></div>
+    <div><span class="k" data-i18n="stDur"></span><span class="v" id="sDur">–</span></div>
+    <div><span class="k" data-i18n="stPhotos"></span><span class="v" id="sCount">–</span></div>
+  </section>
+
+  <div id="warnings"></div>
+
+  <section class="list-wrap">
+    <div class="list-head">
+      <div class="label" data-i18n="listLabel"></div>
+      <div class="seg" role="tablist">
+        <button data-filter="all" class="on" data-i18n="filterAll"></button>
+        <button data-filter="issues" data-i18n="filterIssues"></button>
+      </div>
+    </div>
+    <ul id="list"></ul>
+  </section>
+
+  <footer>
+    <label class="check"><input type="checkbox" id="wpts" checked> <span data-i18n="wpts"></span></label>
+    <div class="row">
+      <button id="btnClear" class="ghost" data-i18n="btnClear"></button>
+      <button id="btnSave" class="primary" disabled data-i18n="btnSave"></button>
+    </div>
+  </footer>
+</aside>
+
+<main id="mapWrap">
+  <div id="map"></div>
+  <div id="empty" class="empty">
+    <div>
+      <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+      <h2 data-i18n="emptyTitle"></h2>
+      <p data-i18n-html="emptyText"></p>
+    </div>
+  </div>
+  <div class="legend" id="legend" hidden>
+    <span><i class="dot ok"></i><span data-i18n="legOk"></span></span>
+    <span><i class="dot snapped"></i><span data-i18n="legSnapped"></span></span>
+    <span><i class="dot nogps"></i><span data-i18n="legNogps"></span></span>
+    <span><i class="dot bad"></i><span data-i18n="legBad"></span></span>
+  </div>
+  <div id="about" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="aboutName">
+    <div class="modal-box">
+      <button class="modal-x" id="aboutX" aria-label="Close">×</button>
+      <img src="icon.png" width="96" height="96" alt="">
+      <h2 id="aboutName" data-i18n="appTitle"></h2>
+      <div class="ver" id="aboutVer"></div>
+      <p class="desc" data-i18n="subtitle"></p>
+      <a href="#" id="aboutSite"></a>
+      <div class="copy" id="aboutCopy"></div>
+      <div class="credit" data-i18n="mapCredit"></div>
+      <div class="row">
+        <button id="aboutDonate" data-i18n="donate"></button>
+        <button id="aboutClose" class="primary" data-i18n="close"></button>
+      </div>
+    </div>
+  </div>
+  <div id="upd" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="updTitle">
+    <div class="modal-box upd-box">
+      <button class="modal-x" id="updX" aria-label="Close">×</button>
+      <img src="icon.png" width="64" height="64" alt="">
+      <h2 id="updTitle"></h2>
+      <div class="ver" id="updVer"></div>
+      <div id="updNotesWrap"><div class="label" data-i18n="updNotes"></div><pre id="updNotes"></pre></div>
+      <div id="updProgress" class="progress" hidden><div id="updBar"></div></div>
+      <div id="updMsg" class="upd-msg"></div>
+      <div class="row">
+        <button id="updSkip" class="ghost" data-i18n="updSkip"></button>
+        <button id="updLater" data-i18n="updLater"></button>
+        <button id="updNow" class="primary"></button>
+      </div>
+    </div>
+  </div>
+  <div id="toast" hidden></div>
+  <div id="busy" hidden><div class="spinner"></div><span data-i18n="busy"></span></div>
+</main>
+
+<script src="leaflet/leaflet.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

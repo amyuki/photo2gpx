@@ -1,0 +1,9 @@
+name: Other
+description: A question or anything not covered above
+body:
+  - type: textarea
+    id: text
+    attributes:
+      label: Description
+    validations:
+      required: true
