@@ -1,0 +1,30 @@
+# build output
+/build/bin/
+/dist/
+/build/*.exe
+*.exe
+*.exe.old
+*.app
+*.dmg
+*.zip
+*.syso.tmp
+rsrc_windows_386.syso
+
+# Go
+*.test
+*.out
+coverage.*
+/vendor/
+
+# private test data: GPS positions from personal photos and a third-party
+# route; the tests skip when these files are missing
+/core/testdata/
+
+# editors / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
