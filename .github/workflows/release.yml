@@ -82,24 +82,33 @@ jobs:
     runs-on: macos-15 # Apple Silicon; the Intel slice is cross-compiled
     env:
       CGO_ENABLED: "1"
-      MACOSX_DEPLOYMENT_TARGET: "10.15"
-      CGO_CFLAGS: "-mmacosx-version-min=10.15"
-      CGO_LDFLAGS: "-mmacosx-version-min=10.15"
+      # Go 1.26 binaries need macOS 12 or later
+      MACOSX_DEPLOYMENT_TARGET: "12.0"
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      - name: Toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          clang --version
+          go version
       - name: Version
         id: v
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then V="${GITHUB_REF_NAME#v}"; else V="${{ inputs.version }}"; fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
-      - name: Build universal binary (Apple Silicon + Intel)
+          echo "ldflags=-s -w -X main.AppVersion=$V -X main.GitHubRepo=${{ github.repository }}" >> "$GITHUB_OUTPUT"
+      - name: Build Apple Silicon binary
+        run: GOARCH=arm64 go build -v -trimpath -tags desktop,production -ldflags "${{ steps.v.outputs.ldflags }}" -o build/bin/Photo2GPX-arm64 .
+      - name: Build Intel binary
+        env:
+          CC: clang -arch x86_64
+        run: GOARCH=amd64 go build -v -trimpath -tags desktop,production -ldflags "${{ steps.v.outputs.ldflags }}" -o build/bin/Photo2GPX-amd64 .
+      - name: Universal binary
         run: |
-          LDFLAGS="-s -w -X main.AppVersion=${{ steps.v.outputs.version }} -X main.GitHubRepo=${{ github.repository }}"
-          GOARCH=arm64 go build -trimpath -tags desktop,production -ldflags "$LDFLAGS" -o build/bin/Photo2GPX-arm64 .
-          GOARCH=amd64 go build -trimpath -tags desktop,production -ldflags "$LDFLAGS" -o build/bin/Photo2GPX-amd64 .
           lipo -create -output build/bin/Photo2GPX build/bin/Photo2GPX-arm64 build/bin/Photo2GPX-amd64
           lipo -info build/bin/Photo2GPX
       - name: Assemble Photo2GPX.app

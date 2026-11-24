@@ -29,7 +29,7 @@ You came back from a walk, a hike or a trip with photos but no GPS recording. Yo
 ## Supported platforms
 
 - **Windows 10 / 11**, 64-bit. Uses Microsoft Edge WebView2, which is included in Windows 10/11.
-- **macOS 10.15 or later**, Apple Silicon and Intel.
+- **macOS 12 (Monterey) or later**, Apple Silicon and Intel.
 
 ## Installation
 

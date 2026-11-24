@@ -28,3 +28,7 @@ desktop.ini
 .vscode/
 *.swp
 *~
+
+# local transfer folder
+/_gh/
+/github-workflows/
